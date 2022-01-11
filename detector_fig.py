@@ -5,13 +5,14 @@ llave = 0 #Nos permitira finalizar el programa
 while llave == 0:
     ret, frame = cap.read() #se crea variable de pausa y de nombre de la ventana
     gris = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)# Convierte imagenes captadas en binarias
-    frame_gris = cv2.Canny(gris,130,150)#-------------------------
+    fgaussiano = cv2.GaussianBlur(gris,(5,5),0)
+    frame_gris = cv2.Canny(fgaussiano,130,150)#-------------------------
     frame_gris = cv2.dilate(frame_gris,None,iterations=1)#       |--> se aplica difuminado y redondeado para mejorar persepción
     frame_gris = cv2.erode(frame_gris,None,iterations=1)#---------
     contornos,hierachy =cv2.findContours(frame_gris,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE) # Se recolectan los contornos captados en la imagen
     
     for c in contornos:
-        epsilon = 0.02*cv2.arcLength(c,True)#variable relacionada con el perimetro de la imagen. 
+        epsilon = 0.02*cv2.arcLength(c,True)#variable relacionada con el perimetro de la imagen o longitud de contorno 
         aproximar = cv2.approxPolyDP(c,epsilon,True)# se aproxima para obtener los vertices de las figuras
         x,y,w,h =cv2.boundingRect(aproximar)#Se obtienen cordenadas y calculo del alto y ancho promedio de la imagen
 ######################------------------Inicio de condicionales para detección de figuras-------------############################
@@ -31,9 +32,9 @@ while llave == 0:
             cv2.putText(frame,'Estrella',(x,y-5),1,1,(0,255,0),1)
         if len(aproximar)==8:
             cv2.putText(frame,'Circulo',(x,y-5),1,1,(0,255,0),1)
-        cv2.drawContours(frame,[aproximar],0,(0,255,0),2)  
+        cv2.drawContours(frame,[aproximar],0,(0,255,0),2) #Dibujan los contornos de todas la figuras
         cv2.imshow('frame',frame)
-        k = cv2.waitKey(1)
+        k = cv2.waitKey(0)
         if k == ord('s'):# condicional para finalizar el programa
             llave = 1
 cap.release()
